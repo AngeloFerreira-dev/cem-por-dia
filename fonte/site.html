@@ -487,7 +487,14 @@ button.chip:hover { border-color: var(--cyan); }
   const CONTR = [[/\bi'm\b/g, 'i am'], [/\bit's\b/g, 'it is'], [/\bthat's\b/g, 'that is'], [/\bthere's\b/g, 'there is'], [/\bshe's\b/g, 'she is'], [/\bhe's\b/g, 'he is'],
     [/\bdon't\b/g, 'do not'], [/\bdoesn't\b/g, 'does not'], [/\bdidn't\b/g, 'did not'], [/\bcan't\b/g, 'cannot'], [/\bcan not\b/g, 'cannot'], [/\bwhat's\b/g, 'what is'], [/\bwhere's\b/g, 'where is'],
     [/\byou're\b/g, 'you are'], [/\bi'll\b/g, 'i will'], [/\bi'd\b/g, 'i would'], [/\bi've\b/g, 'i have'], [/\blet's\b/g, 'let us'], [/\bwe're\b/g, 'we are'], [/\bthey're\b/g, 'they are'],
-    [/\bwi-?fi\b/g, 'wifi'], [/\bok\b/g, 'okay'], [/\bt\.?v\.?\b/g, 'tv'], [/\bmum\b/g, 'mom'], [/\btraveling\b/g, 'travelling'], [/\btraveled\b/g, 'travelled'], [/\bgonna\b/g, 'going to']];
+    [/\bwi-?fi\b/g, 'wifi'], [/\bok\b/g, 'okay'], [/\bt\.?v\.?\b/g, 'tv'], [/\bmum\b/g, 'mom'], [/\btraveling\b/g, 'travelling'], [/\btraveled\b/g, 'travelled'], [/\bgonna\b/g, 'going to'],
+    [/\bwanna\b/g, 'want to'], [/\bgotta\b/g, 'got to'], [/\bhafta\b/g, 'have to'], [/\buseta\b/g, 'used to'], [/\boughta\b/g, 'ought to'], [/\bs'posed\b/g, 'supposed'],
+    [/\bkinda\b/g, 'kind of'], [/\bsorta\b/g, 'sort of'], [/\boutta\b/g, 'out of'], [/\blotsa\b/g, 'lots of'], [/\bgimme\b/g, 'give me'], [/\blemme\b/g, 'let me'],
+    [/\bdunno\b/g, 'do not know'], [/\bgotcha\b/g, 'got you'], [/\bwhatcha\b/g, 'what are you'], [/\bwhaddya\b/g, 'what do you'], [/\bdidja\b/g, 'did you'],
+    [/\bcouldja\b/g, 'could you'], [/\bwouldja\b/g, 'would you'], [/\by'all\b/g, 'you all'], [/\bya\b/g, 'you'], [/\bc'mon\b/g, 'come on'], [/\b'em\b/g, 'them'],
+    [/\bwon't\b/g, 'will not'], [/\bisn't\b/g, 'is not'], [/\baren't\b/g, 'are not'], [/\bwasn't\b/g, 'was not'], [/\bhaven't\b/g, 'have not'], [/\bcouldn't\b/g, 'could not'],
+    [/\bshouldn't\b/g, 'should not'], [/\bwouldn't\b/g, 'would not'], [/\byou've\b/g, 'you have'], [/\bwe've\b/g, 'we have'], [/\byou'll\b/g, 'you will'], [/\bwe'll\b/g, 'we will'],
+    [/\bit'll\b/g, 'it will'], [/\bhe'll\b/g, 'he will'], [/\bshe'll\b/g, 'she will'], [/\bthey'll\b/g, 'they will'], [/\byou'd\b/g, 'you would'], [/\bwho's\b/g, 'who is'], [/\bhow's\b/g, 'how is']];
   function norm(s) {
     s = String(s || '').toLowerCase().replace(/[’‘`]/g, "'");
     CONTR.forEach(([r, t]) => { s = s.replace(r, t); });
