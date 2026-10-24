@@ -753,6 +753,7 @@ button.chip:hover { border-color: var(--cyan); }
     $('lScene').innerHTML = scene(p, w);
     $('lFrame').innerHTML = w.frame !== '___' ? 'Molde: <b>' + esc(w.frame) + '</b>' : '<b>Frase pronta</b>';
     $('lEn').innerHTML = enHtml(p, w);
+    $('lEn').style.fontSize = p.en.length > 55 ? '24px' : p.en.length > 34 ? '29px' : '';
     $('lPt').textContent = g(p.pt);
     const hd = $('lHeard'); hd.className = 'heard'; hd.textContent = mode === 'voice' ? 'Ouça e repita em voz alta. O microfone liga sozinho depois do áudio.' : 'Ouça e digite a frase em inglês.';
     $('btnNext').disabled = !L.passed[p.id];

@@ -268,8 +268,9 @@ DAYS = [
 
 
 from curriculo import PLAN, MONTHS
-import dias_06_10, dias_11_15, dias_16_20, dias_21_25, dias_26_30
-EXTRA = dias_06_10.DAYS + dias_11_15.DAYS + dias_16_20.DAYS + dias_21_25.DAYS + dias_26_30.DAYS
+import dias_06_10, dias_11_15, dias_16_20, dias_21_25, dias_26_30, dias_091_095, dias_096_100
+EXTRA = (dias_06_10.DAYS + dias_11_15.DAYS + dias_16_20.DAYS + dias_21_25.DAYS + dias_26_30.DAYS
+         + dias_091_095.DAYS + dias_096_100.DAYS)
 
 
 def all_days():
