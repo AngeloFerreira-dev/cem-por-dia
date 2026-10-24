@@ -63,6 +63,11 @@ button.chip:hover { border-color: var(--cyan); }
 .wave.cur { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(62,230,255,.2); animation: glow 1.6s infinite; }
 @keyframes glow { 50% { box-shadow: 0 0 0 6px rgba(62,230,255,.08); } }
 .wave.lock { opacity: .4; cursor: default; }
+.levels { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 18px; color: var(--muted); font-weight: 700; font-size: 14px; }
+.levels button { background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-weight: 800; color: var(--text); }
+.levels button.on { background: linear-gradient(135deg, var(--cyan), var(--pink)); color: #0d1024; border-color: transparent; }
+.soonbox { background: var(--bg2); border: 1px dashed var(--line); border-radius: 20px; padding: 18px; color: var(--muted); }
+.soonbox b { color: var(--text); font-family: var(--f-head); font-size: 20px; display: block; margin-bottom: 4px; }
 .months { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
 .month { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 8px 14px; text-align: left; display: grid; gap: 2px; }
 .month b { font-family: var(--f-head); font-size: 16px; }
@@ -274,6 +279,7 @@ button.chip:hover { border-color: var(--cyan); }
         </ul>
       </div>
     </div>
+    <div class="levels" id="levels"><span>Começar no nível:</span></div>
     <div class="months" id="months" role="tablist"></div>
     <p class="month-tag" id="monthTag"></p>
     <div class="dgrid" id="dgrid"></div>
@@ -288,7 +294,6 @@ button.chip:hover { border-color: var(--cyan); }
         <div><b>💬 Conversa</b>30 a 60 min falando sem roteiro (meses 4 a 6 terão treino no app)</div>
       </div>
     </div>
-    <label class="free"><input type="checkbox" id="freeMode"> Liberar todos os dias e ondas (para explorar)</label>
   </section>
 
   <!-- INTRO (molde) -->
@@ -641,9 +646,13 @@ button.chip:hover { border-color: var(--cyan); }
   // ---------- Home ----------
   const waveDone = w => !!store.waves[w.id];
   const dayDone = d => d.waves.every(waveDone);
-  const dayOpen = d => store.free || d.n === 1 || (DAYN[d.n - 1] && dayDone(DAYN[d.n - 1]));
-  const waveOpen = w => store.free || (dayOpen(w.day) && (w.idx === 0 || waveDone(w.day.waves[w.idx - 1])));
-  const nextWave = () => WAVES.find(w => !waveDone(w) && waveOpen(w)) || null;
+  // Every level is open: you can start anywhere (e.g. B2) and go forward from there.
+  const LEVELS = [['A1', 1], ['A2', 31], ['B1', 61], ['B2', 91], ['C1', 151]];
+  const startDay = () => store.start || 1;
+  const levelOf = n => LEVELS.filter(l => n >= l[1]).pop()[0];
+  const dayOpen = d => true;
+  const waveOpen = w => true;
+  const nextWave = () => WAVES.find(w => !waveDone(w) && w.day.n >= startDay()) || null;
   let selDay = 0;
   function renderHome() {
     stopVoice(); renderTop();
@@ -656,7 +665,16 @@ button.chip:hover { border-color: var(--cyan); }
     const due = dueIds().length, seen = seenIds().length;
     $('btnReview').disabled = seen === 0;
     $('reviewInfo').textContent = seen === 0 ? 'A revisão abre depois da primeira onda.' : due ? due + ' frase' + (due > 1 ? 's' : '') + ' para revisar hoje · ' + seen + ' frases aprendidas' : 'Nada vencendo hoje. A revisão reforça as mais fracas · ' + seen + ' frases aprendidas';
-    if (!selDay) selDay = nw ? nw.day.n : DAYS[DAYS.length - 1].n;
+    const lv = $('levels'); [...lv.querySelectorAll('button')].forEach(b => b.remove());
+    LEVELS.forEach(([name, day]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = name;
+      b.className = levelOf(startDay()) === name ? 'on' : '';
+      b.title = 'Começar no dia ' + day;
+      b.addEventListener('click', () => { Sfx.click(); store.start = day; save(); selDay = day; renderHome(); });
+      lv.appendChild(b);
+    });
+    if (!nw) { $('btnGo').textContent = DAYN[startDay()] ? '🏆 Tudo concluído a partir daqui' : '⏳ Nível ' + levelOf(startDay()) + ' em preparação'; }
+    if (!selDay) selDay = nw ? nw.day.n : startDay();
     const selMonth = Math.ceil(selDay / 30);
     const mb = $('months'); mb.innerHTML = '';
     PLAN.months.forEach(m => {
@@ -670,7 +688,7 @@ button.chip:hover { border-color: var(--cyan); }
     const grid = $('dgrid'); grid.innerHTML = '';
     PLAN.days.filter(x => Math.ceil(x.n / 30) === selMonth).forEach(x => {
       const d = DAYN[x.n], t = document.createElement('button'); t.type = 'button';
-      if (!d) { t.className = 'dtile soon'; t.innerHTML = '<b>' + x.n + '</b><small>' + esc(x.name) + '</small><small>em breve</small>'; t.title = x.tag; t.addEventListener('click', () => Sfx.bad()); grid.appendChild(t); return; }
+      if (!d) { t.className = 'dtile soon'; t.innerHTML = '<b>' + x.n + '</b><small>' + esc(x.name) + '</small><small>em breve</small>'; t.title = x.tag; t.className += x.n === selDay ? ' sel' : ''; t.addEventListener('click', () => { Sfx.click(); selDay = x.n; renderHome(); }); grid.appendChild(t); return; }
       const open = dayOpen(d), done = d.waves.filter(waveDone).length;
       t.className = 'dtile' + (done === 10 ? ' done' : '') + (open ? '' : ' lock') + (x.n === selDay ? ' sel' : '');
       t.innerHTML = '<b>' + (open ? x.n : '🔒') + '</b><small>' + esc(x.name) + '</small><span class="pbar"><i style="width:' + done * 10 + '%"></i></span>';
@@ -679,6 +697,10 @@ button.chip:hover { border-color: var(--cyan); }
       grid.appendChild(t);
     });
     const box = $('days'); box.innerHTML = '';
+    if (!DAYN[selDay]) {
+      const x = PLAN.days[selDay - 1];
+      box.innerHTML = '<div class="soonbox"><b>Dia ' + x.n + ' · ' + esc(x.name) + '</b>' + esc(x.tag) + '. As frases deste dia (nível ' + levelOf(x.n) + ') ainda estão sendo escritas. Os dias 1 a ' + DAYS[DAYS.length - 1].n + ' já estão prontos.</div>';
+    }
     [DAYN[selDay]].filter(Boolean).forEach(d => {
       const open = dayOpen(d), done = d.waves.filter(waveDone).length;
       const el = document.createElement('div'); el.className = 'day' + (open ? '' : ' locked');
@@ -695,10 +717,8 @@ button.chip:hover { border-color: var(--cyan); }
       });
       box.appendChild(el);
     });
-    $('freeMode').checked = !!store.free;
     show('home');
   }
-  $('freeMode').addEventListener('change', e => { store.free = e.target.checked; save(); renderHome(); });
   $('btnGo').addEventListener('click', () => { const w = nextWave(); if (w) { selDay = w.day.n; openIntro(w); } });
   $('btnReview').addEventListener('click', startReview);
 
