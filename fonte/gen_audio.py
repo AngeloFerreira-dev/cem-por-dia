@@ -13,10 +13,12 @@ if len(sys.argv) > 2:
     i, n = map(int, sys.argv[2].split('/')); jobs = jobs[i::n]
 for i, (pid, text) in enumerate(jobs):
     mp3 = f'{OUT}/{pid}.mp3'
-    if os.path.exists(mp3): continue
+    txt = f'{OUT}/{pid}.txt'
+    if os.path.exists(mp3) and (not os.path.exists(txt) or open(txt).read() == text): continue
     s, sr = k.create(text, voice='af_heart', speed=0.92, lang='en-us')
     sf.write(f'{OUT}/{pid}.wav', s, sr)
     subprocess.run(['ffmpeg','-loglevel','error','-y','-i',f'{OUT}/{pid}.wav','-af','silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,apad=pad_dur=0.1','-ac','1','-ar','24000','-b:a','32k',mp3], check=True)
     os.remove(f'{OUT}/{pid}.wav')
+    open(txt, 'w').write(text)
     print(i, len(jobs), pid, flush=True)
 print('DONE', len(jobs))

@@ -268,9 +268,10 @@ DAYS = [
 
 
 from curriculo import PLAN, MONTHS
-import dias_06_10, dias_11_15, dias_16_20, dias_21_25, dias_26_30, dias_091_095, dias_096_100
-EXTRA = (dias_06_10.DAYS + dias_11_15.DAYS + dias_16_20.DAYS + dias_21_25.DAYS + dias_26_30.DAYS
-         + dias_091_095.DAYS + dias_096_100.DAYS)
+import glob, importlib, os
+EXTRA = []
+for _f in sorted(glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dias_*.py'))):
+    EXTRA += importlib.import_module(os.path.basename(_f)[:-3]).DAYS
 
 
 def all_days():
@@ -321,5 +322,10 @@ if __name__ == '__main__':
                 assert '{x}' not in p['en'] + p['pt'], p
                 assert p['pt'].count('[') == p['pt'].count(']'), p
                 seen.setdefault(p['en'].lower(), []).append(p['id'])
+    import re as _r
+    html = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'site.html')).read()
+    mods = set(_r.findall(r"case '([a-z]+)'", html)); bgs = set(_r.findall(r'\.bg-([a-z]+)', html))
+    bad = [(d['n'], w['title'], w['mod'], w['bg']) for d in days for w in d['waves'] if w['mod'] not in mods or w['bg'] not in bgs]
+    print('cenas inválidas:', bad[:20])
     dup = {k: v for k, v in seen.items() if len(v) > 1}
     print('repetidas:', len(dup)); [print(' ', k, v) for k, v in list(dup.items())[:40]]
