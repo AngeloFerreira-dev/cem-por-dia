@@ -321,6 +321,7 @@ if __name__ == '__main__':
                 assert p['en'] and p['pt'] and p['e'], p
                 assert '{x}' not in p['en'] + p['pt'], p
                 assert p['pt'].count('[') == p['pt'].count(']'), p
+                assert not re.search(r'\[[^\]|]*\]', p['pt']), p
                 seen.setdefault(p['en'].lower(), []).append(p['id'])
     import re as _r
     html = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'site.html')).read()
